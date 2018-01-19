@@ -1,0 +1,88 @@
+/**
+ * 登录样式
+ * @Author WY
+ * @Date 2017年12月15日
+ */
+
+/** ============登录div-start============ */
+/*  login.div */
+.login-content {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+/* 	background-color: rgba(192, 192, 192, .1); */
+}
+
+/* login.div */
+.login-div {
+	width: 40%;
+	height:40%;
+	
+	max-height: 280px;
+	min-height: 260px;
+	
+	max-width:  400px;
+	min-width:  380px;
+	
+	border: 1px solid #A9A9A9;
+/* 	background-color: rgba(135, 206, 250, .4); */
+	padding-left:40px;
+	padding-right:40px;
+	padding-bottom:20px;
+	position: absolute;
+	top: -10%;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: 50%;
+	height: 50%;
+	margin: auto;
+	border-radius: 5px;
+	box-shadow: 5px 5px 10px 2px #A9A9A9;
+	/*这6个值分别是：left值 、top值、透明度、阴影外延宽度、颜色、向里凹陷（选填，默认为外延）*/
+}
+
+.login-title {
+	width: 100%;
+	text-align: center;
+	height:60px;
+	margin-bottom: 10px;
+}
+
+.login-title h1 {
+	padding: 10px;
+}
+
+.layui-form {
+	width:100%;
+	height:100%;
+	font-size: 18px;
+}
+
+.layui-form-small {
+	font-size: 14px;
+}
+
+
+/** ============登录div-end============ */
+
+/** ============按钮样式-start============ */
+/* 按钮基本样式 */
+.btn-div {
+	text-align: center;
+}
+
+.btn {
+	font-size: 18px;
+	width: 100px;
+}
+
+/* 按钮居右 */
+.btn-right {
+/* 	float: right; */
+	margin-left: 40px;
+}
+/** ============按钮样式-end============ */
+
