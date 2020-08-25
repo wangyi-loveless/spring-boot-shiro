@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shayne.constans.ApiCons;
 import com.shayne.domain.Menu;
+import com.shayne.domain.User;
 import com.shayne.domain.vo.ApiResult;
 import com.shayne.domain.vo.PageData;
 import com.shayne.domain.vo.PageImpl;
 import com.shayne.service.MenuService;
+import com.shayne.service.RoleMenuService;
 
 /**
  * 菜单管理控制器：菜单增删改查操作
@@ -31,11 +34,14 @@ import com.shayne.service.MenuService;
  * @Date 2018年1月4日
  */
 @RestController
-@RequestMapping(value=ApiCons.MENU_OPER)
+@RequestMapping(value=ApiCons.API + ApiCons.SEPARATOR + ApiCons.MENU)
 public class MenuController extends BaseController {
 
     @Autowired
-    private MenuService  menuService;
+    private MenuService menuService;
+    
+    @Autowired
+    private RoleMenuService roleMenuService;
     
     /**
      * 新增菜单
@@ -57,17 +63,40 @@ public class MenuController extends BaseController {
      */
     @DeleteMapping
     public ApiResult<String> delete(@RequestParam("id") String ids) {
-    	if(!ids.contains(",")) {
-    		menuService.delete(new Long(ids));
-    	}else {
-    		String[] idsArr = ids.split(",");
-    		Set<Long> idsSet = new HashSet<>();
-    		for (String id : idsArr) {
-    			idsSet.add(new Long(id));
-    		}
-    		menuService.delete(idsSet);
+    	String msg = "";
+    	if(StringUtils.isBlank(ids)) {
+    		msg = "ID为空，无删除数据!";
+    		return ApiResult.fail(msg);
     	}
-    	return ApiResult.success();
+		String[] idsArr = ids.split(",");
+		Set<Long> idsSet = new HashSet<>();
+		boolean deleteAbleFlag = true;
+		for (String id : idsArr) {
+			if(StringUtils.isNotBlank(id)) {
+				Long menuId = new Long(id); 
+				Long cnt = roleMenuService.contByMenuId(menuId);
+				if(cnt>0) {
+					deleteAbleFlag = false;
+					msg = "ID为"+id+"的菜单已授权给在用角色，请先处理授权再删除数据!";
+					break;
+				}
+				idsSet.add(menuId);
+			}
+		}
+		// 判断菜单是否已经授权，授权的不可删除
+		if(!deleteAbleFlag) {
+			return ApiResult.fail(msg);
+		}
+		
+		try {
+			menuService.delete(idsSet);
+			return ApiResult.success();
+		} catch (Exception e) {
+			logger.error("删除数据发生异常：");
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		return ApiResult.fail(msg);
     }
     
     /**
@@ -98,11 +127,46 @@ public class MenuController extends BaseController {
      */
     @GetMapping(value="/user")
     public ApiResult<List<Map<String, Object>>> user() {
-        //所有菜单数据，后续会添加权限过滤
-        List<Menu> allMenu = menuService.find();
+    	ApiResult<List<Map<String, Object>>> result = new ApiResult<>();
+    	String msg = "SUCCESS";
+    	result.setResult(true);
+    	result.setMsg(msg);
+    	User user = null;
+		try {
+			user = getCurrentUser();
+		} catch (Exception e) {
+			msg = "用户未登录";
+			result.setResult(false);
+			result.setMsg(msg);
+			logger.error("获取用户信息发生异常：");
+			e.printStackTrace();
+		}
+    	// 查询当前用户的所有权限
+        List<Menu> menuList = null;
+        
+		// 获取用户对应权限菜单
+        try {
+			menuList = menuService.findByUser(user);
+		} catch (Exception e) {
+			msg = "获取用户授权菜单异常";
+			result.setMsg(msg);
+			result.setResult(false);
+			logger.error("用户角色授权异常:");
+			e.printStackTrace();
+		}
         //构造好的菜单数据
-        List<Map<String, Object>> menus = generatorMenu(allMenu);
-        return new ApiResult<>(menus);
+        List<Map<String, Object>> menus = null;
+		try {
+			menus = generatorMenu(menuList);
+		} catch (Exception e) {
+			msg = "获取用户授权菜单异常";
+			result.setMsg(msg);
+			result.setResult(false);
+			logger.error("用户角色授权异常:");
+			e.printStackTrace();
+		}
+        result.setData(menus);
+        return result;
     }
     
     /**

@@ -11,8 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
-import com.shayne.constans.BaseCons;
-import com.shayne.constans.LoginCons;
+import com.shayne.constans.ApiCons;
 
 /**
  * 重写shiro表单过滤器FormAuthenticationFilter中的onAccessDenied方法，在该方法中除了实现原有的功能外，
@@ -27,7 +26,7 @@ public class CustomerFormAuthenticationFilter extends FormAuthenticationFilter {
 
     /** 设置登录页面 */
     public CustomerFormAuthenticationFilter() {
-        setLoginUrl(BaseCons.BASE_PATH + LoginCons.LOGIN);
+        setLoginUrl(ApiCons.SEPARATOR + ApiCons.LOGIN);
     }
 
     @Override

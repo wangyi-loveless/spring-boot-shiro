@@ -61,11 +61,6 @@ public class Menu implements Serializable {
     @OrderBy("id ASC")
     private Set<RoleMenu> roleMenuSet;
     
-    /** 菜单对应多个操作  */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "operationId", fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
-    private Set<MenuOperation> menuOperationSet;
-
     public Long getId() {
         return id;
     }
@@ -120,13 +115,5 @@ public class Menu implements Serializable {
 
     public void setRoleMenuSet(Set<RoleMenu> roleMenuSet) {
         this.roleMenuSet = roleMenuSet;
-    }
-
-    public Set<MenuOperation> getMenuOperationSet() {
-        return menuOperationSet;
-    }
-
-    public void setMenuOperationSet(Set<MenuOperation> menuOperationSet) {
-        this.menuOperationSet = menuOperationSet;
     }
 }

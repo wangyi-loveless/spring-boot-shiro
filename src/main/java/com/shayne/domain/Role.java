@@ -1,6 +1,7 @@
 package com.shayne.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,9 +15,6 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * 系统角色表
@@ -42,17 +40,16 @@ public class Role implements Serializable {
     @Column(length=64)
     private String roleName;
    
-    /** 角色对应多个用户  */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderBy("id ASC")
-    private Set<UserRole> userRoleSet;
-    
-    /** 角色对应多个用户  */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    /** 角色对应多个菜单  */
+    @OneToMany(cascade = CascadeType.ALL, 
+    		mappedBy = "roleId", fetch = FetchType.LAZY)
     @OrderBy("id ASC")
     private Set<RoleMenu> roleMenuSet;
+    
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
     public Long getId() {
         return id;
@@ -70,14 +67,6 @@ public class Role implements Serializable {
         this.roleName = roleName;
     }
 
-    public Set<UserRole> getUserRoleSet() {
-        return userRoleSet;
-    }
-
-    public void setUserRoleSet(Set<UserRole> userRoleSet) {
-        this.userRoleSet = userRoleSet;
-    }
-
     public Set<RoleMenu> getRoleMenuSet() {
         return roleMenuSet;
     }
@@ -85,4 +74,12 @@ public class Role implements Serializable {
     public void setRoleMenuSet(Set<RoleMenu> roleMenuSet) {
         this.roleMenuSet = roleMenuSet;
     }
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 }

@@ -102,7 +102,7 @@ $.ajaxSetup({
 /** 退出登录 */
 var logout = function(msg) {
 	var confirm = function() {
-		window.location.href='/login';
+		window.location.href='/logout';
 	}
 	lay_confirm(msg, confirm);
 };
@@ -120,11 +120,19 @@ var lay_confirm = function(msg, confirm) {
  * 打开Layer窗口
  */
 var layerWin = function(title, content, cancel, yes) {
+	layerOpenWin(title, 1, content, cancel, yes)
+};
+
+
+/**
+ * 打开Layer窗口
+ */
+var layerOpenWin = function(title, type, content, cancel, yes) {
 	layer.open({
 		id:'add_menu_form',
 		//area: ['820px', '400px'],
 		//layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
-		type: 1,
+		type: type,
 		skin: 'layui-layer-molv', //样式类名
 		closeBtn: 2, //关闭按钮
 		title:title,

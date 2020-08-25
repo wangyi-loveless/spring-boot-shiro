@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.shayne.constans.BaseCons;
+import com.shayne.constans.ApiCons;
+import com.shayne.constans.ConfigCons;
 import com.shayne.constans.ExceptionCons;
 import com.shayne.domain.User;
 import com.shayne.util.EncryptComponent;
@@ -64,7 +65,8 @@ public abstract class BaseController {
      * User
      */
     protected User encrypt(User user) {
-        return md5Util.encrypt(user, BaseCons.SHIRO_ENCRYPT_ALGORITHM_NAME, BaseCons.SHIRO_ENCRYPT_HASH_ITERATIONS);
+        return md5Util.encrypt(user, ConfigCons.SHIRO_ENCRYPT_ALGORITHM_NAME, 
+        		ConfigCons.SHIRO_ENCRYPT_HASH_ITERATIONS);
     }
     
     /**
@@ -75,7 +77,7 @@ public abstract class BaseController {
      */
     protected ModelAndView baseModelAndView(String name) {
         ModelAndView mv = new ModelAndView(name);
-        mv.addObject(BaseCons.APPLICATION_NAME, APPLICATION_NAME);
+        mv.addObject(ConfigCons.APPLICATION_NAME, APPLICATION_NAME);
         return mv;
     }
     
@@ -86,8 +88,9 @@ public abstract class BaseController {
      * ModelAndView
      */
     protected ModelAndView baseExceptionModelAndView(String name) {
-        ModelAndView mv = baseModelAndView(BaseCons.EXCEPTION_PATH + name);
-        mv.addObject(BaseCons.APPLICATION_NAME, APPLICATION_NAME);
+        ModelAndView mv = baseModelAndView(ApiCons.EXCEPTION 
+        		+ ApiCons.SEPARATOR + name);
+        mv.addObject(ConfigCons.APPLICATION_NAME, APPLICATION_NAME);
         return mv;
     }
     

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.shayne.domain.Menu;
+import com.shayne.domain.User;
 
 /**
  * 系统菜单service
@@ -70,9 +71,16 @@ public interface MenuService {
     Page<Menu> find(Pageable pageable, String name);
     
     /**
-     * 查询所有用户
+     * 查询所有菜单
      * @return
      * Set<User>
      */
     List<Menu> findByPid(Long pid);
+    
+    /**
+     * 查询当前用户所有菜单
+     * @param user
+     * @return
+     */
+    List<Menu> findByUser(User user);
 }

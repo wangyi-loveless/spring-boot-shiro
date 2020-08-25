@@ -1,6 +1,7 @@
 package com.shayne.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,8 +17,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.NotBlank;
 
 
@@ -48,9 +47,22 @@ public class User implements Serializable {
     @Column(length=64)
     private String password;
     
+    @Column(length=64)
+    private String nickName;
+    
+    @Column(length=32)
+    private String phoneNo;
+    
+    @Column(length=8)
+    private String gender;
+    
+    @Column(length=256)
+    private String headUrl;
+    
+    private Date createTime;
+    
     /** 用户对应多个角色  */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.EAGER)
     @OrderBy("id ASC")
     private Set<UserRole> userRoleSet;
     
@@ -61,51 +73,91 @@ public class User implements Serializable {
     @Column(length=64)
     private String salt;
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public Set<UserRole> getUserRoleSet() {
-        return userRoleSet;
-    }
+	public String getNickName() {
+		return nickName;
+	}
 
-    public void setUserRoleSet(Set<UserRole> userRoleSet) {
-        this.userRoleSet = userRoleSet;
-    }
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 
-    public String getRememberMe() {
-        return rememberMe;
-    }
+	public String getPhoneNo() {
+		return phoneNo;
+	}
 
-    public void setRememberMe(String rememberMe) {
-        this.rememberMe = rememberMe;
-    }
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
 
-    public String getSalt() {
-        return salt;
-    }
+	public String getGender() {
+		return gender;
+	}
 
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getHeadUrl() {
+		return headUrl;
+	}
+
+	public void setHeadUrl(String headUrl) {
+		this.headUrl = headUrl;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Set<UserRole> getUserRoleSet() {
+		return userRoleSet;
+	}
+
+	public void setUserRoleSet(Set<UserRole> userRoleSet) {
+		this.userRoleSet = userRoleSet;
+	}
+
+	public String getRememberMe() {
+		return rememberMe;
+	}
+
+	public void setRememberMe(String rememberMe) {
+		this.rememberMe = rememberMe;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
 }

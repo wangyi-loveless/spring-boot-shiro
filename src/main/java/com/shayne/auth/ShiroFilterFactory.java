@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
@@ -106,7 +107,10 @@ public class ShiroFilterFactory extends ShiroFilterFactoryBean {
                     flag = false;
                 }
             }else {
-                //自定义可以匿名访问的路径
+            	//自定义匿名访问的路径
+            	if(StringUtils.equalsIgnoreCase(uri, "/test")) {
+            		flag = false;
+            	}
             }
             if (flag) {
                 super.doFilterInternal(servletRequest, servletResponse, chain);

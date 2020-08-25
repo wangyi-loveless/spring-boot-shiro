@@ -4,12 +4,13 @@
 	</div>
 	<button class="layui-btn" data-type="reload">搜索</button>
 	<button class="layui-btn" data-type="add" style="width:60px;">新增</button>
-	<button class="layui-btn layui-btn-danger" data-type="del" style="width:60px; margin-right: 10%;">删除</button>
+	<button class="layui-btn layui-btn-danger" data-type="del" 
+	style="width:60px; margin-right: 10%;">删除</button>
 </div>
 <table class="layui-hide" id="user_table" lay-filter="filter"></table>
-<script type="text/html" id="barMenu">
-	<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+<script type="text/html" id="barUser">
 	<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
 	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+	<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="grant">授权</a>
 </script>
-<script th:src="@{/js/user/user.index.js}" type="text/javascript"></script>
+<script th:src="@{/js/user.js}" type="text/javascript"></script>

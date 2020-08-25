@@ -21,9 +21,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
-import com.shayne.constans.BaseCons;
+import com.shayne.constans.ApiCons;
+import com.shayne.constans.ConfigCons;
 import com.shayne.constans.ExceptionCons;
-import com.shayne.constans.LoginCons;
 
 /**
  * Shiro配置管理器
@@ -53,9 +53,9 @@ public class ShiroConfiguration {
     public HashedCredentialsMatcher hashedCredentialsMatcher() {
         HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
         // 指定散列算法,缺省为md5
-        credentialsMatcher.setHashAlgorithmName(BaseCons.SHIRO_ENCRYPT_ALGORITHM_NAME);
+        credentialsMatcher.setHashAlgorithmName(ConfigCons.SHIRO_ENCRYPT_ALGORITHM_NAME);
         // 散列迭代次数
-        credentialsMatcher.setHashIterations(BaseCons.SHIRO_ENCRYPT_HASH_ITERATIONS);
+        credentialsMatcher.setHashIterations(ConfigCons.SHIRO_ENCRYPT_HASH_ITERATIONS);
         // storedCredentialsHexEnc表示是否存储散列后的密码为16进制，需要和生成密码时的一样。
         credentialsMatcher.setStoredCredentialsHexEncoded(true);
         return credentialsMatcher;
@@ -119,6 +119,8 @@ public class ShiroConfiguration {
         shiroFilterFactoryBean.setFilters(filters);
         
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+        //测试地址不拦截
+        filterChainDefinitionMap.put("/test/", "anon");
         /**
          *  authc：该过滤器下的页面必须验证后才能访问，
          *  它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter
@@ -127,8 +129,6 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/**", "authc");
         logger.info("##################从数据库读取权限规则，加载到shiroFilter中##################");
         
-        //登录不拦截
-//        filterChainDefinitionMap.put(BaseCons.BASE_PATH + LoginCons.LOGIN, "anon");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
     }
     
@@ -142,11 +142,11 @@ public class ShiroConfiguration {
         // 必须设置 SecurityManager
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         // 如果不设置默认会自动寻找Web工程根目录下的"/login"页面
-        shiroFilterFactoryBean.setLoginUrl(BaseCons.BASE_PATH + LoginCons.LOGIN);
+        shiroFilterFactoryBean.setLoginUrl(ApiCons.SEPARATOR + ApiCons.LOGIN);
         // 登录成功后要跳转的连接
 //        shiroFilterFactoryBean.setSuccessUrl(BaseCons.BASE_PATH + ApiCons.INDEX);
         //设置没有权限的跳转路径
-        shiroFilterFactoryBean.setUnauthorizedUrl(BaseCons.BASE_PATH + ExceptionCons.UNAUTHORIZED);
+        shiroFilterFactoryBean.setUnauthorizedUrl(ApiCons.SEPARATOR + ExceptionCons.UNAUTHORIZED);
         //过滤器
         loadShiroFilterChain(shiroFilterFactoryBean);
         return shiroFilterFactoryBean;

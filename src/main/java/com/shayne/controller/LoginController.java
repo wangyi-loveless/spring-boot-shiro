@@ -10,16 +10,13 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import com.shayne.constans.LoginCons;
+import com.shayne.constans.ApiCons;
 import com.shayne.domain.vo.ApiResult;
 import com.shayne.domain.vo.UserVo;
 import com.shayne.util.IpUtil;
@@ -40,8 +37,8 @@ public class LoginController extends BaseController {
      * @return
      * String
      */
-    @PostMapping(value = LoginCons.LOGIN)
     @ResponseBody
+    @PostMapping(value = ApiCons.LOGIN)
     public ApiResult<String> login(@Valid @RequestBody UserVo user, HttpServletRequest request) {
         //用户帐号
         String username = user.getUsername();
@@ -89,35 +86,5 @@ public class LoginController extends BaseController {
             token.clear();
             return ApiResult.fail("登录失败");
         } 
-    }
-    
-    /**
-     * 登录页
-     * @return
-     * ModelAndView
-     */
-    @GetMapping(value=LoginCons.LOGIN)
-    public ModelAndView login() {
-        return baseModelAndView(LoginCons.LOGIN);
-    }
-    
-    /**
-     * 登出
-     * @return
-     * ModelAndView
-     */
-    @GetMapping(value=LoginCons.LOGOUT)
-    public ModelAndView logout() {
-        //获取当前的Subject  
-        Subject subject = SecurityUtils.getSubject();
-        if(null == subject) {
-            return baseModelAndView(LoginCons.LOGIN);
-        }
-        Session session = subject.getSession();
-        if(null == session) {
-            return baseModelAndView(LoginCons.LOGIN);
-        }
-        subject.logout();
-        return baseModelAndView(LoginCons.LOGIN);
     }
 }
