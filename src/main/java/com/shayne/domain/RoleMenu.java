@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 @IdClass(value=RoleMenuIds.class)
 public class RoleMenu implements Serializable {
 
-
     /** serialVersionUID */
     private static final long serialVersionUID = -3777344385410559543L;
 

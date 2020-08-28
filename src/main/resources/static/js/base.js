@@ -120,17 +120,34 @@ var lay_confirm = function(msg, confirm) {
  * 打开Layer窗口
  */
 var layerWin = function(title, content, cancel, yes) {
-	layerOpenWin(title, 1, content, cancel, yes)
+	layerOpenType(title, 1, content, cancel, yes)
 };
 
-
-/**
- * 打开Layer窗口
- */
-var layerOpenWin = function(title, type, content, cancel, yes) {
+/** 打开Layer窗口 */
+var layerOpenType = function(title, type, content, cancel, yes) {
 	layer.open({
 		id:'add_menu_form',
 		//area: ['820px', '400px'],
+		//layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+		type: type,
+		skin: 'layui-layer-molv', //样式类名
+		closeBtn: 2, //关闭按钮
+		title:title,
+		// anim: 0-平滑放大-默认，1-从上掉落 ， 2-从最底部往上滑入 ，3-从左滑入，4-从左翻滚，5-渐显，6-抖动
+		anim: 4,
+		shadeClose: true, //开启遮罩关闭
+		content: content,
+		btn: ['确定'],
+		cancel: cancel,
+		yes: yes
+	});
+};
+
+/** 打开Layer窗口 */
+var layerOpenArea = function(title, type, content, cancel, yes, area) {
+	layer.open({
+		id:'add_menu_form',
+		area: area,
 		//layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
 		type: type,
 		skin: 'layui-layer-molv', //样式类名

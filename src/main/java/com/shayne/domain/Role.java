@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * 系统角色表
  * @Author WY
@@ -37,6 +39,7 @@ public class Role implements Serializable {
     private Long id;
     
     /** 角色名称  */
+    @NotBlank(message = "角色名称不能为空")
     @Column(length=64)
     private String roleName;
    

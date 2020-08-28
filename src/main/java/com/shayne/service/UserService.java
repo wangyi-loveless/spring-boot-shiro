@@ -75,4 +75,11 @@ public interface UserService {
 	 * @param idsSet
 	 */
 	void delete(Set<Long> idsSet);
+
+	/**
+	 * 是否有角色
+	 * @param idsSet
+	 * @return
+	 */
+	boolean hasRole(Set<Long> idsSet);
 }

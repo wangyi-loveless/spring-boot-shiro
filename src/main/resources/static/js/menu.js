@@ -1,11 +1,29 @@
+var menus;
+
+/** 获取父级菜单数据 */
+var fn_get_parent_menus = function() {
+	var success = function(data) {
+		if(null != data){
+			menus = data;
+		}
+	}
+	var data = {};
+	var url = '/api/menu/parent';
+	ajax(url, 'GET', success, data, false);
+	return menus;
+};
 /**
  * 菜单列表绑定数据
  * @returns
  */
 layui.use(['table','form'], function() {
-  	//lay table对象
+	// 获取父级菜单
+	fn_get_parent_menus();
+	
+	//lay table对象
 	var table = layui.table,
 	form = layui.form;
+	
 	//table绑定数据
 	table.render({
 		elem: '#menu_table'
@@ -13,17 +31,17 @@ layui.use(['table','form'], function() {
 		,cols: [[
 			{type:'checkbox', fixed:'left', width:'3%'}
 		    ,{field:'id', align:'center', width:'5%', title: 'ID', sort: true}
-		    ,{field:'name',align:'center', width:'20%', title: '菜单'}
+		    ,{field:'pid',align:'center', width:'15%', title: '父级菜单', sort: true}
+		    ,{field:'name',align:'center', width:'15%', title: '菜单'}
+		    ,{field:'url',align:'center', width:'20%', title: 'URL'}
+		    ,{field:'icon',align:'center', width:'10%', title: '图标'}
 		    ,{field:'sequence',align:'center', width:'6%', title: '排序', sort: true}
-		    ,{field:'status',align:'center', width:'10%', title: '状态', minWidth: 150}
-		    ,{field:'url',align:'center', width:'20%', title: 'URL', sort: true}
-		    ,{field:'pid',align:'center', width:'6%', title: 'pid', sort: true}
+		    ,{field:'status',align:'center', width:'6%', title: '状态', minWidth: 150}
 		    ,{align:'center', titile:'操作', toolbar: '#barMenu'}
 		]]
 		,page: true
 	});
 	
-
 	//行id
 	var menu_id, title;
 	//监听工具条
@@ -156,6 +174,10 @@ layui.use(['table','form'], function() {
 			if(!pid) {
 				pid = 0;
 			}
+			var icon = $('select[name=icon]').val();
+			if(icon == undefined || null == icon) {
+				icon = '';
+			}
 			var id = $('input[name=id]').val();
 			var name = $('input[name=name]').val();
 			var url = $('input[name=url]').val();
@@ -168,6 +190,7 @@ layui.use(['table','form'], function() {
 				'id': id,
 				'pid':pid,
 				'name':name,
+				'icon':icon,
 				'url':url,
 				'sequence':sequence,
 				'status':status
@@ -177,8 +200,9 @@ layui.use(['table','form'], function() {
 				fn_ajax_submit_menu_form(data, index);
 			}
 		}
-		//打开窗口
-		layerWin(title, content, cancel, yes);
+		
+		var area = ['820px', '660px'];
+		layerOpenArea(title, 1, content, cancel, yes, area);
 		
 		//动态表单重新绑定表单对象
 		form.render();
@@ -195,6 +219,7 @@ layui.use(['table','form'], function() {
 	var fn_menu_add_or_edit_form_html = function() {
 		var edit_menu_id = '';
 		var edit_menu_name = '';
+		var edit_menu_icon = '';
 		var edit_menu_url = '';
 		var edit_menu_pid = 0;
 		var edit_menu_sequence = '';
@@ -204,6 +229,7 @@ layui.use(['table','form'], function() {
 			edit_menu_id = edit_menu.id;
 			edit_menu_name = edit_menu.name==null?'':edit_menu.name;
 			edit_menu_url = edit_menu.url==null?'':edit_menu.url;
+			edit_menu_icon = edit_menu.icon==null?'':edit_menu.icon;
 			edit_menu_pid = edit_menu.pid;
 			edit_menu_sequence = edit_menu.sequence;
 			edit_menu_status = edit_menu.status;
@@ -256,6 +282,30 @@ layui.use(['table','form'], function() {
 		menu_html_arr.push('</div>');
 		menu_html_arr.push('</div>');
 		
+		// 图标
+		menu_html_arr.push('<div class="layui-form-item">');
+		menu_html_arr.push('<label class="layui-form-label">图标</label>');
+		menu_html_arr.push('<div class="layui-input-block">');
+		menu_html_arr.push('<select name="icon" lay-filter="">');
+		menu_html_arr.push('<option value=""></option>');
+		var icon_data = fn_get_icon();
+		if(icon_data != undefined){
+			var icon_len = icon_data.length;
+			for (var j = 0; j < icon_len; j++) {
+				var icon = icon_data[j];
+				var id = icon.id;
+				var value = icon.value;
+				if(edit_menu_icon == id) {
+					menu_html_arr.push('<option value="'+ id +'" selected="selected">'+ value +'</option>');
+				}else {
+					menu_html_arr.push('<option value="'+ id +'">'+ value +'</option>');
+				}
+			}
+		}
+		menu_html_arr.push('</select>');
+		menu_html_arr.push('</div>');
+		menu_html_arr.push('</div>');
+		
 		//菜单顺序
 		menu_html_arr.push('<div class="layui-form-item">');
 		menu_html_arr.push('<label class="layui-form-label">顺序</label>');
@@ -285,20 +335,18 @@ layui.use(['table','form'], function() {
 		menu_html_arr.push('</form>');
 		return menu_html_arr.join('');
 	};
-
-	/**
-	 * 获取父级菜单数据
-	 */
-	var fn_get_parent_menus = function() {
-		var menus;
+	
+	/** 获取图标JSON数据 */
+	var fn_get_icon = function(){
+		var icon;
 		var success = function(data) {
 			if(null != data){
-				menus = data;
+				icon = data;
 			}
 		}
 		var data = {};
-		var url = '/api/menu/parent';
+		var url = '../json/icon.json';
 		ajax(url, 'GET', success, data, false);
-		return menus;
+		return icon;
 	};
 });

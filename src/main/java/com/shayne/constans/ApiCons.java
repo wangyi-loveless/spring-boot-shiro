@@ -39,6 +39,9 @@ public interface ApiCons {
     /** 字典管理  */
     public static final String DICTIONARY = "dictionary";
     
+    /** 字典类型管理  */
+    public static final String DICTYPE = "dictype";
+    
     /** 角色菜单管理  */
     public static final String ROLEMENU = "rolemenu";
     

@@ -36,36 +36,44 @@ public class RoleController extends BaseController {
     private RoleService roleService;
     
     /**
-     * 新增角色
-     * @param role
-     * @return
-     * String
+     * 新增/更新
+     * @param Role role
+     * @return ApiResult<String>
      */
     @PostMapping
     public ApiResult<String> save(@RequestBody Role role) {
+    	ApiResult<String> result = new ApiResult<String>();
     	//角色信息加密
     	String msg = "SUCCESS";
+    	result.setMsg(msg);
+    	result.setResult(true);
     	if(null == role) {
     		msg = "角色信息为空！";
-    		ApiResult.fail(msg);
+    		result.setMsg(msg);
+    		result.setResult(false);
     	}
-    	role.setCreateTime(new Date());
+    	
+    	// 写入创建时间
+    	if(null == role.getCreateTime()) {
+    		role.setCreateTime(new Date());
+    	}
         
         //角色信息保存
         try {
 			role = roleService.save(role);
-			return new ApiResult<>(msg);
 		} catch (Exception e) {
-			logger.error("保存角色发生异常：");
 			msg = e.getMessage();
+			result.setMsg(msg);
+    		result.setResult(false);
+			logger.error("保存角色发生异常：");
 			e.printStackTrace();
 		}
-        return ApiResult.fail(msg);
+        return result;
     }
     
     /**
-     * 删除角色
-     * @param String id
+     * 批量删除
+     * @param String ids
      * @return ApiResult<String>
      */
     @DeleteMapping
@@ -84,7 +92,7 @@ public class RoleController extends BaseController {
 		} catch (Exception e) {
 			msg = e.getMessage();
 			result.setMsg(msg);
-			result.setResult(true);
+			result.setResult(false);
 			logger.error("删除角色发生系统异常：");
 			e.printStackTrace();
 		}
@@ -93,9 +101,8 @@ public class RoleController extends BaseController {
     
     /**
      * 查询角色
-     * @param id
-     * @return
-     * Role
+     * @param Long id
+     * @return ApiResult<Role>
      */
     @GetMapping
     public ApiResult<Role> get(@RequestParam(value="id") Long id) {
@@ -116,9 +123,11 @@ public class RoleController extends BaseController {
     }
     
     /**
-     * 查询菜单
-     * @return
-     * String
+     * 查询分页数据
+     * @param Integer page
+     * @param Integer limit
+     * @param String rolename
+     * @return PageData<Role>
      */
     @GetMapping(value="page")
     public PageData<Role> page(
@@ -129,6 +138,9 @@ public class RoleController extends BaseController {
     	PageData<Role> pageData = new PageData<>();
         try {
 			PageImpl pageImpl = new PageImpl(page, limit);
+			if(StringUtils.isNotBlank(rolename)) {
+				rolename = "%" + rolename + "%";
+			}
 			Page<Role> p = roleService.pageList(pageImpl, rolename);
 			pageData.setCode(0);
 			pageData.setCount(p.getTotalElements());
@@ -143,9 +155,8 @@ public class RoleController extends BaseController {
     
     /**
      * 角色授权
-     * @param sysRole
-     * @return
-     * String
+     * @param RoleMenuVo sysRole
+     * @return ApiResult<Role>
      */
     @PostMapping(value="grant")
     public ApiResult<Role> grant(@RequestBody RoleMenuVo roleMenu) {

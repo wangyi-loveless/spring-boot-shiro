@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.shayne.constans.ConfigCons;
 import com.shayne.domain.User;
 
 /**
@@ -118,5 +119,19 @@ public class EncryptComponent {
         String newPassword = simpleHash.toHex();
         user.setPassword(newPassword);
         return user;
+    }
+	
+    /**
+     * 加密密码
+     * @param password
+     * @param salt
+     * @return
+     */
+    public String encrypt(String password, String salt) {
+    	ByteSource byteSource = ByteSource.Util.bytes(salt);
+        SimpleHash simpleHash = new SimpleHash(ConfigCons.SHIRO_ENCRYPT_ALGORITHM_NAME, password, 
+                byteSource, ConfigCons.SHIRO_ENCRYPT_HASH_ITERATIONS); 
+        String newPassword = simpleHash.toHex();
+        return newPassword;
     }
 }

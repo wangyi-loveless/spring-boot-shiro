@@ -8,12 +8,15 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.shayne.constans.ConfigCons;
 import com.shayne.dao.MenuDao;
 import com.shayne.dao.RoleDao;
 import com.shayne.dao.RoleMenuDao;
+import com.shayne.dao.UserRoleDao;
 import com.shayne.domain.Menu;
 import com.shayne.domain.Role;
 import com.shayne.domain.RoleMenu;
@@ -32,6 +35,9 @@ public class MenuServiceImpl implements  MenuService {
     
     @Autowired
     private RoleDao roleDao;
+    
+    @Autowired
+    private UserRoleDao userRoleDao;
 
     @Override
     public Menu findByName(String name) {
@@ -84,46 +90,49 @@ public class MenuServiceImpl implements  MenuService {
 		if(null == user) {
 			return null;
 		}
-		Set<UserRole> userRoleSet = user.getUserRoleSet();
-		if(null == userRoleSet) {
+		
+		// 通过用户ID查询角色用户管理关系
+		List<UserRole> userRoleList = userRoleDao.findByUserId(user.getId());
+		if(null == userRoleList) {
 			return null;
 		}
+		
+		// 角色ID集合
 		Set<Long> roleIdSet = new HashSet<Long>();
-		for (UserRole userRole : userRoleSet) {
+		for (UserRole userRole : userRoleList) {
 			roleIdSet.add(userRole.getRoleId());
 		}
+		
+		// 通过角色ID集合，查询角色菜单关联关系
 		List<RoleMenu> roleMenuList = roleMenuDao.findByRoleIdIn(roleIdSet);
 		Set<Long> menuIdSet = new HashSet<Long>();
 		for (RoleMenu roleMenu : roleMenuList) {
 			menuIdSet.add(roleMenu.getMenuId());
 		}
-		// 用户角色
-		Set<UserRole> userRoleSets = user.getUserRoleSet();
 		
 		// 角色名称集合
-		Set<String> roleNameSet = getRolesByUserRole(userRoleSets);
+		Set<String> roleNameSet = getRoles(roleIdSet);
 		
 		List<Menu> menuList = null;
 		if(null != roleNameSet && roleNameSet.contains(ConfigCons.ROLE_ADMIN)) {
-			menuList = menuDao.findAll();
+			Sort sort = new Sort(Direction.ASC, "sequence");
+			menuList = menuDao.findAll(sort);
 		}else {
-			menuList = menuDao.findByIdIn(menuIdSet);
+			menuList = menuDao.findByIdInOrderBySequenceAsc(menuIdSet);
 		}
 		return menuList;
 	}
 	
 	 /**
-     * 通过UserRole查询角色名称集合
-     * @param userRoleSets
-     * @return
-     */
-    private Set<String> getRolesByUserRole(Set<UserRole> userRoleSets){
+	  * 查询角色集合
+	  * @param Set<Long> roleIdSet
+	  * @return Set<String>
+	  */
+    private Set<String> getRoles(Set<Long> roleIdSet){
     	Set<String> roleNameSet = new HashSet<String>();
-    	if(null != userRoleSets && userRoleSets.getClass().getName() == Set.class.getName() 
-    			&& !userRoleSets.isEmpty()) {
-    		for (UserRole userRole : userRoleSets) {
-    			Long roleId = userRole.getRoleId();
-    			Role role = roleDao.findOne(roleId);
+    	if(null != roleIdSet && roleIdSet.size()>0) {
+    		List<Role> roleList = roleDao.findByIdIn(roleIdSet);
+    		for (Role role : roleList) {
     			if(null != role) {
     				roleNameSet.add(role.getRoleName());
     			}

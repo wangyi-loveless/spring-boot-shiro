@@ -39,12 +39,15 @@ public class Menu implements Serializable {
     @Column(length=20)
     private Long id;
     
-    @Column(length=128)
-    @NotBlank
+    @NotBlank(message = "菜单名称")
+    @Column(length=128, nullable=false)
     private String name;
     
     @Column(length=256)
     private String url;
+    
+    @Column(length=256)
+    private String icon;
     
     @Column(length=16)
     private Integer sequence;
@@ -116,4 +119,12 @@ public class Menu implements Serializable {
     public void setRoleMenuSet(Set<RoleMenu> roleMenuSet) {
         this.roleMenuSet = roleMenuSet;
     }
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
 }

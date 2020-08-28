@@ -29,8 +29,7 @@ public class ViewController extends BaseController {
 	
 	/**
      * 登录页
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.LOGIN)
     public ModelAndView login() {
@@ -39,8 +38,7 @@ public class ViewController extends BaseController {
     
     /**
      * 登出
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.LOGOUT)
     public ModelAndView logout() {
@@ -59,8 +57,7 @@ public class ViewController extends BaseController {
 	
     /**
      * 首页
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.INDEX)
     public ModelAndView index() {
@@ -69,8 +66,7 @@ public class ViewController extends BaseController {
     
     /**
      * 菜单管理
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.MENU)
     public ModelAndView menu() {
@@ -79,11 +75,12 @@ public class ViewController extends BaseController {
     
     /**
      * 菜单管理
-     * @return
-     * ModelAndView
+     * @param Long roleId
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.ROLEMENU)
-    public ModelAndView rolemenu(@RequestParam(value = "roleId", required = false) Long roleId) {
+    public ModelAndView rolemenu(
+    		@RequestParam(value = "roleId", required = false) Long roleId) {
     	ModelAndView mv = baseModelAndView(ApiCons.ROLEMENU);
     	String menuIds = "";
 		if(null != roleId) {
@@ -95,17 +92,16 @@ public class ViewController extends BaseController {
     
     /**
      * 用户管理
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.USER)
     public ModelAndView user() {
     	return baseModelAndView(ApiCons.USER);
     }
+    
     /**
      * 角色管理
-     * @return
-     * ModelAndView
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.ROLE)
     public ModelAndView role() {
@@ -114,11 +110,12 @@ public class ViewController extends BaseController {
     
     /**
      * 用户角色管理
-     * @return
-     * ModelAndView
+     * @param Long userId
+     * @return ModelAndView
      */
     @GetMapping(value=ApiCons.USERROLE)
-    public ModelAndView userrole(@RequestParam(value = "userId", required = false) Long userId) {
+    public ModelAndView userrole(
+    		@RequestParam(value = "userId", required = false) Long userId) {
     	ModelAndView mv = baseModelAndView(ApiCons.USERROLE);
     	String roleIds = "";
 		if(null != userId) {
@@ -126,5 +123,23 @@ public class ViewController extends BaseController {
 		}
     	mv.addObject("roleIds", roleIds );
     	return mv;
+    }
+    
+    /**
+     * 字典类型管理
+     * @return ModelAndView
+     */
+    @GetMapping(value=ApiCons.DICTYPE)
+    public ModelAndView dictype() {
+    	return baseModelAndView(ApiCons.DICTYPE);
+    }
+    
+    /**
+     * 字典管理
+     * @return ModelAndView
+     */
+    @GetMapping(value=ApiCons.DICTIONARY)
+    public ModelAndView dictionary() {
+    	return baseModelAndView(ApiCons.DICTIONARY);
     }
 }

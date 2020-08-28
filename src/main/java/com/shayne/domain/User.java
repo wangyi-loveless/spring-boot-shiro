@@ -17,6 +17,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.NotBlank;
 
 
@@ -62,7 +64,8 @@ public class User implements Serializable {
     private Date createTime;
     
     /** 用户对应多个角色  */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
+    @OnDelete(action=OnDeleteAction.CASCADE)
     @OrderBy("id ASC")
     private Set<UserRole> userRoleSet;
     

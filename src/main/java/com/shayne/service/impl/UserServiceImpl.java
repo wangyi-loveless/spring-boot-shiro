@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,6 +53,7 @@ public class UserServiceImpl implements  UserService {
     }
 
     @Override
+    @Transactional
     public User grant(Long userId, Set<Long> roleIds) {
     	if(null == userId) {
     		return null;
@@ -99,5 +102,22 @@ public class UserServiceImpl implements  UserService {
 			List<User> userList = userDao.findByIdIn(ids);
 			userDao.deleteInBatch(userList);
 		}
+	}
+
+	@Override
+	public boolean hasRole(Set<Long> idsSet) {
+		if(null == idsSet || idsSet.size() == 0) {
+			return false;
+		}
+		
+		boolean flag = false;
+		for (Long userId : idsSet) {
+			List<UserRole> list = userRoleDao.findByUserId(userId);
+			if(null != list && list.size() > 0) {
+				flag = true;
+				break;
+			}
+		}
+		return flag;
 	}
 }

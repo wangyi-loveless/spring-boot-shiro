@@ -45,28 +45,42 @@ public class MenuController extends BaseController {
     
     /**
      * 新增菜单
-     * @param menu
-     * @return
-     * String
+     * @param Menu menu
+     * @return ApiResult<Menu>
      */
     @PostMapping
     public ApiResult<Menu> add(@RequestBody Menu menu) {
-        menu = menuService.save(menu);
-        return new ApiResult<>(menu);
+    	ApiResult<Menu> result = new ApiResult<Menu>();
+    	String msg = "SUCCESS";
+    	result.setMsg(msg);
+        try {
+			menu = menuService.save(menu);
+			result.setResult(true);
+		} catch (Exception e) {
+			msg = e.getMessage();
+			result.setMsg(msg);
+			result.setResult(true);
+			logger.error("保存菜单发生系统异常：");
+			e.printStackTrace();
+		}
+        result.setData(menu);
+        return result;
     }
     
     /**
-     * 删除菜单-批量
-     * @param sysMenu
-     * @return
-     * String
+     * 批量删除
+     * @param String ids
+     * @return ApiResult<String>
      */
     @DeleteMapping
     public ApiResult<String> delete(@RequestParam("id") String ids) {
-    	String msg = "";
+    	ApiResult<String> result = new ApiResult<String>();
+    	String msg = "SUCCESS";
     	if(StringUtils.isBlank(ids)) {
     		msg = "ID为空，无删除数据!";
-    		return ApiResult.fail(msg);
+    		result.setMsg(msg);
+    		result.setResult(false);
+    		return result;
     	}
 		String[] idsArr = ids.split(",");
 		Set<Long> idsSet = new HashSet<>();
@@ -85,32 +99,41 @@ public class MenuController extends BaseController {
 		}
 		// 判断菜单是否已经授权，授权的不可删除
 		if(!deleteAbleFlag) {
-			return ApiResult.fail(msg);
+			result.setMsg(msg);
+    		result.setResult(false);
+			return result;
 		}
 		
 		try {
 			menuService.delete(idsSet);
-			return ApiResult.success();
+			result.setResult(true);
 		} catch (Exception e) {
+			msg = e.getMessage();
+			result.setMsg(msg);
+    		result.setResult(false);
 			logger.error("删除数据发生异常：");
 			e.printStackTrace();
-			msg = e.getMessage();
 		}
-		return ApiResult.fail(msg);
+		return result;
     }
     
     /**
-     * 查询菜单
-     * @return
-     * String
+     * 查询分页数据
+     * @param Integer page
+     * @param Integer limit
+     * @param String name
+     * @return PageData<Menu>
      */
     @GetMapping
-    public PageData<Menu> find(
+    public PageData<Menu> page(
     		@RequestParam(value="page") Integer page,
             @RequestParam(value="limit") Integer limit,
             @RequestParam(value="queryKey", required=false) String name
             ) {
         PageImpl pageImpl = new PageImpl(page, limit);
+		if(StringUtils.isNotBlank(name)) {
+			name = "%" + name + "%";
+		}
         Page<Menu> p = menuService.find(pageImpl, name);
         PageData<Menu> pageData = new PageData<>();
         pageData.setCode(0);
@@ -122,8 +145,7 @@ public class MenuController extends BaseController {
     
     /**
      * 查询用户的权限菜单
-     * @return
-     * ApiResult<List<Menu>>
+     * @return ApiResult<List<Menu>>
      */
     @GetMapping(value="/user")
     public ApiResult<List<Map<String, Object>>> user() {
@@ -158,6 +180,11 @@ public class MenuController extends BaseController {
         List<Map<String, Object>> menus = null;
 		try {
 			menus = generatorMenu(menuList);
+			if(null == menus || menus.size() ==0) {
+				msg = "用户未授权";
+				result.setResult(false);
+				result.setMsg(msg);
+			}
 		} catch (Exception e) {
 			msg = "获取用户授权菜单异常";
 			result.setMsg(msg);
@@ -171,8 +198,7 @@ public class MenuController extends BaseController {
     
     /**
      * 查询用户所有父级菜单
-     * @return
-     * ApiResult<List<Menu>>
+     * @return ApiResult<List<Menu>>
      */
     @GetMapping(value="/parent")
     public List<Menu> parent() {
@@ -181,22 +207,31 @@ public class MenuController extends BaseController {
     }
     
     /**
-     * 查询通过id
+     * 通过ID查询单条数据
+     * @param Long id
      * @return
-     * ApiResult<List<Menu>>
      */
     @GetMapping(value="/one")
     public ApiResult<Menu> one(@RequestParam(value="id") Long id) {
-    	//所有菜单数据，后续会添加权限过滤
-    	Menu menu = menuService.findOne(id);
-    	return new ApiResult<>(menu);
+    	ApiResult<Menu> result = new ApiResult<Menu>();
+		try {
+			Menu menu = menuService.findOne(id);
+			result.setData(menu);
+			result.setMsg("SUCCESS");
+			result.setResult(true);
+		} catch (Exception e) {
+			result.setMsg(e.getMessage());
+			result.setResult(false);
+			logger.error("查询用户发生异常：");
+			e.printStackTrace();
+		}
+    	return result;
     }
     
     /**
-     * 构造菜单
-     * @param menuList
-     * @return
-     * List<Map<String,Object>>
+     * 转换菜单数据结构
+     * @param List<Menu> menuList
+     * @return List<Map<String, Object>>
      */
     private List<Map<String, Object>> generatorMenu(List<Menu> menuList) {
         if(null == menuList || menuList.isEmpty()) {
@@ -215,10 +250,9 @@ public class MenuController extends BaseController {
     
     /**
      * 菜单数据构造
-     * @param list
-     * @param menu
-     * @return
-     * Map<String,Object>
+     * @param List<Menu> list
+     * @param Menu menu
+     * @return Map<String,Object>
      */
     private Map<String, Object> menuMap(List<Menu> list, Menu menu) {
         Map<String, Object> map = new HashMap<>();
@@ -226,6 +260,7 @@ public class MenuController extends BaseController {
         map.put("id", id);
         map.put("name", menu.getName());
         map.put("url", menu.getUrl());
+        map.put("icon", menu.getIcon());
         List<Menu> childMenu = getChildMenu(list, id);
         if(null == childMenu || childMenu.isEmpty()) {
             map.put("child", new ArrayList<>());
@@ -238,10 +273,9 @@ public class MenuController extends BaseController {
     
     /**
      * 迭代查询所有菜单
-     * @param list
-     * @param pid
-     * @return
-     * List<Map<String,Object>>
+     * @param List<Menu> list
+     * @param Long pid
+     * @return List<Map<String,Object>>
      */
     private List<Map<String, Object>> getChildMenus(List<Menu> list, Long pid) {
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -256,6 +290,7 @@ public class MenuController extends BaseController {
             map.put("id", id);
             map.put("name", menu.getName());
             map.put("url", menu.getUrl());
+            map.put("icon", menu.getIcon());
             //迭代条件
             List<Menu> childMenu = getChildMenu(list, id);
             if(null == childMenu || childMenu.isEmpty()) {
@@ -272,10 +307,9 @@ public class MenuController extends BaseController {
     
     /**
      * 获取子菜单数据
-     * @param list
-     * @param pid
-     * @return
-     * List<Menu>
+     * @param List<Menu> list
+     * @param Long pid
+     * @return List<Menu>
      */
     private List<Menu> getChildMenu(List<Menu> list, Long pid) {
         if(list == null || list.isEmpty()) {

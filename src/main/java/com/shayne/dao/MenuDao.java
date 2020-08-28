@@ -28,4 +28,6 @@ public interface MenuDao extends JpaRepository<Menu, Long>, JpaSpecificationExec
     List<Menu> findByIdIn(Set<Long> ids);
     
     Page<Menu> findByNameLike(String name, Pageable pageble);
+
+	List<Menu> findByIdInOrderBySequenceAsc(Set<Long> menuIdSet);
 }

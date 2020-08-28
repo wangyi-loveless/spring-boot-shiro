@@ -90,7 +90,7 @@ layui.use(['table','form'], function() {
 			}else {
 				var msg = data.msg;
 				if(msg) {
-					layer.msg(textStatus);
+					layer.msg(msg);
 				}
 			}
 		}

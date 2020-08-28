@@ -28,10 +28,17 @@ public class PageImpl implements Pageable, Serializable{
         super();
     }
 
-    public PageImpl(Integer page, Integer limit) {
+    public PageImpl(Integer page, Integer limit, Sort sort) {
         super();
         this.page = page;
         this.limit = limit;
+        this.sort = sort;
+    }
+    
+    public PageImpl(Integer page, Integer limit) {
+    	super();
+    	this.page = page;
+    	this.limit = limit;
     }
 
     @Override
